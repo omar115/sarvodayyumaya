@@ -1,0 +1,6 @@
+*.csv
+*.pdf
+*.png
+*.zip
+*.rar
+*__pycache__*
