@@ -30,8 +30,8 @@ def driver_init():
 
 def loginPage(driver):
     #logs("loginPage")
-
     # go to the link
+
     driver.get(config.SITE_URL)
 
     
@@ -43,26 +43,39 @@ def loginPage(driver):
     driver.find_element_by_id("username").send_keys("shrcechs")
 
     # inputting password
-    driver.implicitly_wait(10)
     driver.find_element_by_id("password").send_keys("billing@456")  
-    src = driver.find_element_by_id(
-        "img_captcha").screenshot("image/abc.png")
+    driver.implicitly_wait(10)
+    try:
+        src = driver.find_element_by_id(
+            "img_captcha").screenshot("image/abc.png")
 
-    img = Image.open("image/abc.png")
+        img = Image.open("image/abc.png")
 
-    txt = pie.image_to_string(img)
+        txt = pie.image_to_string(img)
 
-    driver.find_element_by_id("txtCaptcha").send_keys(txt)
-    driver.find_element_by_xpath(
-        "/html/body/table/tbody/tr[2]/td[2]/form/table/tbody/tr[1]/td[3]/table/tbody/tr[13]/td/input").click()
-    driver.find_element_by_xpath(
-        "/html/body/div[2]/div/table/tbody/tr[4]/td/input").click()
-    driver.find_element_by_id("ihaveseennmi").click()
-    driver.find_element_by_id("li_0").click()
-    driver.find_element_by_xpath(
-        "/html/body/table/tbody/tr[2]/td[1]/form/div/ul/li[1]/ul/li[1]/a").click()
+        driver.find_element_by_id("txtCaptcha").send_keys(txt)
+        driver.find_element_by_xpath(
+            "/html/body/table/tbody/tr[2]/td[2]/form/table/tbody/tr[1]/td[3]/table/tbody/tr[13]/td/input").click()
+        driver.implicitly_wait(2)
+        driver.find_element_by_xpath(
+            "/html/body/div[2]/div/table/tbody/tr[4]/td/input").click()
+        
+        driver.find_element_by_id("ihaveseennmi").click()  
+            
+        #driver.find_element_by_id("ihaveseennmi").click()
+        #driver.find_element_by_id("li_0").click()
+        #driver.find_element_by_xpath(
+            #"/html/body/table/tbody/tr[2]/td[1]/form/div/ul/li[1]/ul/li[1]/a").click()
+        #driver.implicitly_wait(2)
+            
+    
+    except:
+        print("there is an error")
+        driver.implicitly_wait(10)
+        #driver.find_element_by_xpath('/html/body/div[2]/div/table/tbody/tr[4]/td/input').click() 
+        #driver.close()
+        loginPage(driver)
 
-    # logs("loginPage")
     # login successful
 
 # secondPage
@@ -71,6 +84,14 @@ def loginPage(driver):
 def secondPage(driver, df, index):
 
     print(df)
+
+    #driver.find_element_by_xpath(
+        #"/html/body/div[2]/div/table/tbody/tr[4]/td/input").click()
+            
+    #driver.find_element_by_id("ihaveseennmi").click()
+    driver.find_element_by_id("li_0").click()
+    driver.find_element_by_xpath(
+        "/html/body/table/tbody/tr[2]/td[1]/form/div/ul/li[1]/ul/li[1]/a").click()
 
     select = Select(driver.find_element_by_name('cardType'))
 
@@ -132,8 +153,8 @@ def PatientDetails(driver, df, index):
             break
         else:
             print("hazzelnut")
-            print(name)
-            print(namep)
+            # print(name)
+            # print(namep)
         i = i + 1
     # logs("PatientDetails")
     # patientDetails form fillup successful
@@ -714,7 +735,7 @@ def upDoc(driver, df, start_time, index):
             '/html/body/table/tbody/tr[2]/td[2]/form/div[2]/table/tbody/tr['+str(trs)+']/td[5]')
         idea2 = tdname.text
         id2 = str(idea2)
-        print(id2)
+        # print(id2)
 
         # date e click korbo ami
         datefind2 = driver.find_element_by_xpath(
@@ -722,15 +743,15 @@ def upDoc(driver, df, start_time, index):
 
         datea2 = datefind2.text
         date2 = str(datea2)
-        print(date2)
+        # print(date2)
 
         # ekhon ami check korbo
 
         if (id1 == id2) and (date1 == date2):
-            print(id1)
-            print(id2)
-            print(date1)
-            print(date2)
+            # print(id1)
+            # print(id2)
+            # print(date1)
+            # print(date2)
 
             sid= driver.find_element_by_xpath(
                 '/html/body/table/tbody/tr[2]/td[2]/form/div[2]/table/tbody/tr['+str(trs)+']/td[2]/a')
@@ -740,7 +761,7 @@ def upDoc(driver, df, start_time, index):
             driver.find_element_by_xpath(
                 '/html/body/table/tbody/tr[2]/td[2]/form/div[2]/table/tbody/tr['+str(trs)+']/td[2]/a').click()
 
-            print(claimid)
+            # print(claimid)
             break
 
         if i == 25:
@@ -975,14 +996,6 @@ def upDoc(driver, df, start_time, index):
     driver.implicitly_wait(10)
     driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[3]/td[2]/textarea').send_keys(df["Remarks"].values[index])
-
-
-
-    # to go back to card selection page again--only requires for iteration process
-    #for iteration process please uncomment the below lines.
-
-    #driver.find_element_by_xpath(
-        #'/html/body/table/tbody/tr[2]/td[1]/form/div/ul/li[1]/ul/li[1]/a').click()
 
 
     #Danger::::intimate and go --- restricted it will be only accessed through permission
@@ -1321,7 +1334,7 @@ def fundOfOPDDate(driver, mn, yr, din):
     while(index <= 32):
         din2 = driver.find_element_by_id('jacsCell_'+str(index))
         d = din2.text
-        print(d)
+        # print(d)
         if d == str(din):
             driver.find_element_by_id('jacsCell_'+str(index)).click()
             break
@@ -1387,8 +1400,8 @@ def funOfEDDDate(driver, edin, emn, eyr):
             break
         else:
             print(eyr)
-            print(year)
-            print("sorry")
+            # print(year)
+            # print("sorry")
         year = year+1
 
     # let's tackle teh din
@@ -1396,16 +1409,15 @@ def funOfEDDDate(driver, edin, emn, eyr):
     while(index <= 32):
         din2 = driver.find_element_by_id('jacsCell_'+str(index))
         d = din2.text
-        print(d)
+        # print(d)
         if d == str(edin):
             
             driver.find_element_by_id('jacsCell_'+str(index)).click()
             break
         else:
-
             print(d)
-            print(edin)
-            print("sorry")
+            # print(edin)
+            # print("sorry")
         index = index+1
 
 
@@ -1617,7 +1629,14 @@ def main():
     file = os.path.join(config.PROJECT_ROOT, "Patient Details Form.csv")
     df = pd.read_csv(file)
 
-    index = 0
+
+    # single_run(driver, df, time1, 1)
+
+    continuous_run(driver, df, time1)
+
+
+
+def single_run(driver, df, time1, index):
     loginPage(driver)
     secondPage(driver, df, index)
     PatientDetails(driver, df, index)
@@ -1628,8 +1647,7 @@ def main():
     proposeTreat(driver, df, index)
     upDoc(driver, df, time1, index)
 
-    # for iteration use the below code and uncomment one line in the updoc section
-    '''
+def continuous_run(driver, df, time1):
     loginPage(driver)
     for index in df.index:
         secondPage(driver, df, index)
@@ -1639,8 +1657,7 @@ def main():
         clinicFind(driver, df, index)
         diagnose(driver, df, index)
         proposeTreat(driver, df, index)
-        upDoc(driver, df, index)
-    '''
+        upDoc(driver, df, time1, index)
 
 if __name__ == "__main__":
     main()
