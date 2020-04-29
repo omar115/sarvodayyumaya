@@ -6,7 +6,7 @@ RUN apt-get install apt-transport-https wget
 RUN echo "deb https://notesalexp.org/tesseract-ocr/buster/ buster main" | tee -a /etc/apt/sources.list && \
     wget -O - https://notesalexp.org/debian/alexp_key.asc | apt-key add - && \
     apt-get update
-RUN apt-get install -y tesseract-ocr libtesseract-dev build-essential libc6
+RUN apt-get install -y tesseract-ocr libtesseract-dev build-essential libc6 nano
 
 
 ADD ./requirements.txt /rpa/requirements.txt

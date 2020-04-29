@@ -4,25 +4,35 @@ from PIL import Image
 from selenium.webdriver import Chrome
 from selenium.webdriver.support.ui import Select
 from selenium import webdriver
+import os
+import datetime as dt
+from datetime import datetime
+
+
 from reporting.creatinglogs import logs
+import config
 
 # pie.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
-driver = webdriver.Chrome()
+def driver_init():
+    # browser setup
+    opts = webdriver.ChromeOptions()
+    driver = webdriver.Remote(desired_capabilities=opts.to_capabilities(),
+        command_executor=config.NODE_URL)
 
-driver.maximize_window()
-
-# xls sheet read
-file = "/home/akash/ProjectSelenium/Patient Details Form.csv"
-df = pd.read_csv(file)
+    driver.maximize_window()
+    driver.set_page_load_timeout(25)
+    return driver
 
 
 # story 1
 
-def loginPage():
+def loginPage(driver):
+    #logs("loginPage")
+
     # go to the link
-    driver.get("https://www.echsbpa.utiitsl.com/ECHS/")
+    driver.get(config.SITE_URL)
 
     
         # click close button
@@ -33,8 +43,8 @@ def loginPage():
     driver.find_element_by_id("username").send_keys("shrcechs")
 
     # inputting password
+    driver.implicitly_wait(10)
     driver.find_element_by_id("password").send_keys("billing@456")  
-    driver.implicitly_wait(3)
     src = driver.find_element_by_id(
         "img_captcha").screenshot("image/abc.png")
 
@@ -52,13 +62,13 @@ def loginPage():
     driver.find_element_by_xpath(
         "/html/body/table/tbody/tr[2]/td[1]/form/div/ul/li[1]/ul/li[1]/a").click()
 
-    logs("loginPage")
+    # logs("loginPage")
     # login successful
 
 # secondPage
 
 
-def secondPage(*index):
+def secondPage(driver, df, index):
 
     print(df)
 
@@ -88,14 +98,15 @@ def secondPage(*index):
         '/html/body/table/tbody/tr[2]/td[2]/form/table/tbody/tr[6]/td[2]/input').send_keys(regid)
 
     # click the submit button
+    driver.implicitly_wait(10)
     driver.find_element_by_id('btnsubmit').click()
 
-    logs("secondPage")
+    # logs("secondPage")
     # secondpage -- card selection successful
 
 
 # patient details fillup
-def PatientDetails(*index):
+def PatientDetails(driver, df, index):
     # not in the list continue anyway
     # driver.find_element_by_xpath(
     # '/html/body/table/tbody/tr[2]/td[2]/form/div[1]/table[2]/tbody/tr/td/input').click()
@@ -117,19 +128,19 @@ def PatientDetails(*index):
 
             driver.find_element_by_xpath(
                 '/html/body/div[5]/div[2]/div/div/table/tbody/tr['+str(i)+']/td[1]/input').click()
-            funOfPatientDetails(index)
+            funOfPatientDetails(driver, df, index)
             break
         else:
             print("hazzelnut")
             print(name)
             print(namep)
         i = i + 1
-    logs("PatientDetails")
+    # logs("PatientDetails")
     # patientDetails form fillup successful
 
 
 # admission form fillup
-def admissionFill(*index):
+def admissionFill(driver, df, index):
 
     # click admission
     driver.find_element_by_xpath(
@@ -140,7 +151,7 @@ def admissionFill(*index):
 
     poly = df["Polyclinic"].values[index]
 
-    funOfPoly(poly)
+    funOfPoly(driver, poly)
 
     # adission/opd date
 
@@ -148,7 +159,7 @@ def admissionFill(*index):
     hr = int(df["Hour"].values[index])
     mins = int(df["Min"].values[index])
     print(hr)
-    funOfHour(hr, mins)
+    funOfHour(driver, hr, mins)
 
     # selecting admission / opd date
     driver.find_element_by_xpath(
@@ -160,7 +171,7 @@ def admissionFill(*index):
     mn = int(st[1])
     yr = int(st[2])
 
-    fundOfOPDDate(mn, yr, din)
+    fundOfOPDDate(driver, mn, yr, din)
 
     # inputting admission/opd number
     hasText = driver.find_element_by_xpath(
@@ -185,7 +196,7 @@ def admissionFill(*index):
     driver.find_element_by_xpath(
      '/html/body/table[2]/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[2]/table[1]/tbody/tr[6]/td[4]/img').click()
 
-    funOfEDDDate(edin, emn, eyr)
+    funOfEDDDate(driver, edin, emn, eyr)
 
     # inputting treatment cost
     driver.find_element_by_xpath(
@@ -214,13 +225,13 @@ def admissionFill(*index):
     driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[2]/table[1]/tbody/tr[8]/td[4]/input').send_keys(int(df["Room Number"].values[index]))
 
-    logs("admissionFill")
+    # logs("admissionFill")
     # admission formfillup successful
 
 # patienHistory
 
 
-def patientHistory(*index):
+def patientHistory(driver, df, index):
     # navigate to that tab
 
     driver.find_element_by_xpath(
@@ -356,13 +367,13 @@ def patientHistory(*index):
         driver.find_element_by_css_selector(
             "input[type='radio'][value='M'][name='preailment[7].anyAilment']").click()
 
-    logs("patientHistory")
+    # logs("patientHistory")
     # patienthistory is successful
 
 # clinicFind
 
 
-def clinicFind(*index):
+def clinicFind(driver, df, index):
 
     driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/ul/li[4]/a').click()
@@ -460,13 +471,13 @@ def clinicFind(*index):
         driver.find_element_by_css_selector(
             "input[type='radio'][value='M'][name='clinicalfinding[5].anyTest']").click()
 
-    logs("clinicFind")
+    # logs("clinicFind")
     # clinicfind is successful
 
 # diagnose
 
 
-def diagnose(*index):
+def diagnose(driver, df, index):
 
     driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/ul/li[5]/a').click()
@@ -503,13 +514,13 @@ def diagnose(*index):
             driver.find_element_by_xpath(
                 '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[5]/table[1]/tbody/tr[5]/td[2]/textarea').send_keys(df["Admission Alignment"].values[index])
 
-    logs("diagnose")
+    # logs("diagnose")
     # diagnose is succssful
 
 # proposeTreatment
 
 
-def proposeTreat(*index):
+def proposeTreat(driver, df, index):
     driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/ul/li[6]/a').click()
 
@@ -657,24 +668,24 @@ def proposeTreat(*index):
         driver.find_element_by_css_selector(
             "input[type='radio'][value='M'][name='proposedtreatment[6].anyTreatment']").click()
 
-    logs("proposeTreat")
+    # logs("proposeTreat")
     # propose treatment is successful
 
 # upload document
 
 
-def upDoc(*index):
+def upDoc(driver, df, start_time, index):
     # navigate the site
     driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/ul/li[7]/a').click()
 
     # clicking save and continue
-    #driver.find_element_by_xpath(
-        #'/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[4]/td[1]/input[1]').click()
+    driver.find_element_by_xpath(
+        '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[4]/td[1]/input[1]').click()
 
     # clicking close button
-    #driver.find_element_by_xpath(
-        #'/html/body/div[2]/div/table/tbody/tr[4]/td/input').click()
+    driver.find_element_by_xpath(
+        '/html/body/div[2]/div/table/tbody/tr[4]/td/input').click()
 
     # clicking pending information
     driver.find_element_by_xpath(
@@ -720,8 +731,16 @@ def upDoc(*index):
             print(id2)
             print(date1)
             print(date2)
+
+            sid= driver.find_element_by_xpath(
+                '/html/body/table/tbody/tr[2]/td[2]/form/div[2]/table/tbody/tr['+str(trs)+']/td[2]/a')
+            claim = sid.text
+            claimid = str(claim)
+
             driver.find_element_by_xpath(
                 '/html/body/table/tbody/tr[2]/td[2]/form/div[2]/table/tbody/tr['+str(trs)+']/td[2]/a').click()
+
+            print(claimid)
             break
 
         if i == 25:
@@ -755,9 +774,12 @@ def upDoc(*index):
     doc10 = df["M L C"].values[index]
     doc11 = df["Self Attested Proforma"].values[index]
 
+    DATA_OF_PATIENT = "Data of patient"
+
     if doc1 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Doctor Certificate" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Doctor Certificate.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_"+"Doctor Certificate" + ".pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -768,12 +790,13 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
 
     if doc2 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"ECHS Card Copy" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_ECHS Card Copy.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_ECHS Card Copy.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -784,12 +807,13 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
         
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
 
     if doc3 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Emergency Letter" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Emergency Letter.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_Emergency Letter.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -800,12 +824,13 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
         
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
     '''
     if doc4 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Referral Letter" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Referral Letter.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_Referral Letter.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -816,14 +841,15 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_xpath(
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[4]/input').click()
-        driver.implicitly_wait(5)
     '''
     '''
     if doc5 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Medical Reports" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Medical Reports.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_Medical Reports.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -834,17 +860,18 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_xpath(
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[4]/input').click()
 
-        driver.implicitly_wait(5)
     
     '''
     
 
     if doc6 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Other" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Other.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_Other.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -855,12 +882,13 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
         
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-    driver.implicitly_wait(5)
     '''
     if doc7 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Delay Condonation" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Delay Condonation.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_Delay Condonation.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -871,11 +899,12 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
     if doc8 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Disablity Certificate" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Disablity Certificate.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_Disablity Certificate.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -886,11 +915,12 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
     if doc9 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"EIR" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_EIR.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_EIR.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -901,11 +931,12 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
     if doc10 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"MLC" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_MLC.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_MLC.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -916,11 +947,12 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
     if doc11 == 'Yes':
-        loc = "/home/akash/ProjectSelenium/Data of patient/" + \
-            regID + "/" + pname+"_"+"Self Attested" + ".pdf"
+        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Self Attested.pdf")
+        # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
+        #     regID + "/" + pname+"_Self Attested.pdf"
         print(loc)
         # inputting doctor certificate selection id
         driver.find_element_by_xpath(
@@ -931,8 +963,8 @@ def upDoc(*index):
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[7]/table[1]/tbody/tr/td[3]/span/input').send_keys(loc)
 
         # uploading
+        driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
-        driver.implicitly_wait(5)
             '''
 
     # digital signature issue>> press close button
@@ -940,10 +972,10 @@ def upDoc(*index):
     # print(regID)
 
     # inputting remarks
+    driver.implicitly_wait(10)
     driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[3]/td[2]/textarea').send_keys(df["Remarks"].values[index])
 
-    driver.implicitly_wait(5)
 
 
     # to go back to card selection page again--only requires for iteration process
@@ -956,13 +988,16 @@ def upDoc(*index):
     #Danger::::intimate and go --- restricted it will be only accessed through permission
     #driver.find_element_by_xpath('/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[4]/td[2]/input').click()
 
+    now = datetime.now()
+    time2 = now.strftime("%H:%M:%S")
+    ipnum = df["IP Number"].values[index]
+    logs(start_time,time2,claimid,ipnum)
 
-    logs("upDoc")
 
     # uploading documents is successful
 
 
-def funOfPatientDetails(*index):
+def funOfPatientDetails(driver, df, index):
     # inputting adhar uid
     hasText = driver.find_element_by_xpath(
         '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[1]/table/tbody/tr[10]/td[2]/input[1]')
@@ -981,7 +1016,7 @@ def funOfPatientDetails(*index):
         driver.find_element_by_xpath(
             '/html/body/table/tbody/tr[2]/td[2]/form/table[2]/tbody/tr[1]/td/div/div[1]/table/tbody/tr[11]/td[2]/input').send_keys(df["Address"].values[index])
 
-    funOfState(index)
+    funOfState(driver, df, index)
 
     # inputting mobile number
     hasText = driver.find_element_by_xpath(
@@ -996,7 +1031,7 @@ def funOfPatientDetails(*index):
 
 
 
-def funOfPoly(poly):
+def funOfPoly(driver, poly):
     if poly == '* Inactive - East Delhi (Preet Vihar)':
         select = Select(driver.find_element_by_id('referredDispensary'))
 
@@ -1078,7 +1113,7 @@ def funOfPoly(poly):
         select.select_by_visible_text("Shakurpur")
 
 
-def funOfHour(hr, mins):
+def funOfHour(driver, hr, mins):
     if hr == 0:
         select = Select(driver.find_element_by_name('patientAdmissionHours'))
         select.select_by_visible_text("00")
@@ -1222,7 +1257,7 @@ def funOfHour(hr, mins):
         select.select_by_visible_text("55")
 
 
-def fundOfOPDDate(mn, yr, din):
+def fundOfOPDDate(driver, mn, yr, din):
     # let's tacckle the month---
     if mn == 1:
         select = Select(driver.find_element_by_id('jacsMonths'))
@@ -1293,7 +1328,7 @@ def fundOfOPDDate(mn, yr, din):
         index = index+1
 
 
-def funOfEDDDate(edin, emn, eyr):
+def funOfEDDDate(driver, edin, emn, eyr):
     # let's tacckle the month---
     if emn == 1:
         select = Select(driver.find_element_by_id('jacsMonths'))
@@ -1374,7 +1409,7 @@ def funOfEDDDate(edin, emn, eyr):
         index = index+1
 
 
-def funOfState(index):
+def funOfState(driver, df, index):
     # selecting state
     # dropdown7-state
     state = df["State"].values[index]
@@ -1571,32 +1606,41 @@ def funOfState(index):
 
 
 
-
 # Driver code
-index = 2
-loginPage()
-secondPage(index)
-PatientDetails(index)
-admissionFill(index)
-patientHistory(index)
-clinicFind(index)
-diagnose(index)
-proposeTreat(index)
-upDoc(index)
+def main():
+    driver = driver_init()
 
+    #time generator
+    time1 = datetime.now().strftime("%H:%M:%S")
 
+    # xls sheet read
+    file = os.path.join(config.PROJECT_ROOT, "Patient Details Form.csv")
+    df = pd.read_csv(file)
 
+    index = 0
+    loginPage(driver)
+    secondPage(driver, df, index)
+    PatientDetails(driver, df, index)
+    admissionFill(driver, df, index)
+    patientHistory(driver, df, index)
+    clinicFind(driver, df, index)
+    diagnose(driver, df, index)
+    proposeTreat(driver, df, index)
+    upDoc(driver, df, time1, index)
 
-# for iteration use the below code and uncomment one line in the updoc section
-'''
-loginPage()
-for index in df.index:
-    secondPage(index)
-    PatientDetails(index)
-    admissionFill(index)
-    patientHistory(index)
-    clinicFind(index)
-    diagnose(index)
-    proposeTreat(index)
-    upDoc(index)
-'''
+    # for iteration use the below code and uncomment one line in the updoc section
+    '''
+    loginPage(driver)
+    for index in df.index:
+        secondPage(driver, df, index)
+        PatientDetails(driver, df, index)
+        admissionFill(driver, df, index)
+        patientHistory(driver, df, index)
+        clinicFind(driver, df, index)
+        diagnose(driver, df, index)
+        proposeTreat(driver, df, index)
+        upDoc(driver, df, index)
+    '''
+
+if __name__ == "__main__":
+    main()

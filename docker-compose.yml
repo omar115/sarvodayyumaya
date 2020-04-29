@@ -138,11 +138,30 @@
 
 
 # for building
+# version: "3"
+# services:
+
+#   bot:
+#     build: 
+#       context: ./
+#       dockerfile: ./docker/Dockerfile
 
 version: "3"
-services:
 
+services:
   bot:
-    build: 
-      context: ./
-      dockerfile: ./docker/Dockerfile
+    image: sarvodayyumaya_bot
+    command: 'sleep 20000'
+    env_file: .env
+    volumes: 
+      - ./:/rpa
+    depends_on:
+      - node
+    
+  node:
+    image: hub.ferntechsolutions.com/selenium/standalone-chrome-debug:latest
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 4447:4444
+      - 5901:5900
