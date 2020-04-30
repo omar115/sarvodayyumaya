@@ -154,7 +154,7 @@ services:
     command: 'sleep 20000'
     env_file: .env
     volumes: 
-      - ./:/rpa
+      - ./:/rpa/client_data
     depends_on:
       - node
     

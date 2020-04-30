@@ -9,7 +9,7 @@ import datetime as dt
 from datetime import datetime
 
 
-from reporting.creatinglogs import logs
+from creatinglogs import logs
 import config
 
 # pie.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -47,9 +47,9 @@ def loginPage(driver):
     driver.implicitly_wait(10)
     try:
         src = driver.find_element_by_id(
-            "img_captcha").screenshot("image/abc.png")
+            "img_captcha").screenshot(os.path.join(config.PROJECT_ROOT, 'client_data', 'image', 'abc.png'))
 
-        img = Image.open("image/abc.png")
+        img = Image.open(os.path.join(config.PROJECT_ROOT, 'client_data', 'image', 'abc.png'))
 
         txt = pie.image_to_string(img)
 
@@ -798,7 +798,7 @@ def upDoc(driver, df, start_time, index):
     DATA_OF_PATIENT = "Data of patient"
 
     if doc1 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Doctor Certificate.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Doctor Certificate.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_"+"Doctor Certificate" + ".pdf"
         print(loc)
@@ -815,7 +815,7 @@ def upDoc(driver, df, start_time, index):
         driver.find_element_by_id('uploadButton').click()
 
     if doc2 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_ECHS Card Copy.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_ECHS Card Copy.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_ECHS Card Copy.pdf"
         print(loc)
@@ -832,7 +832,7 @@ def upDoc(driver, df, start_time, index):
         driver.find_element_by_id('uploadButton').click()
 
     if doc3 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Emergency Letter.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Emergency Letter.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_Emergency Letter.pdf"
         print(loc)
@@ -849,7 +849,7 @@ def upDoc(driver, df, start_time, index):
         driver.find_element_by_id('uploadButton').click()
     '''
     if doc4 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Referral Letter.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Referral Letter.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_Referral Letter.pdf"
         print(loc)
@@ -868,7 +868,7 @@ def upDoc(driver, df, start_time, index):
     '''
     '''
     if doc5 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Medical Reports.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Medical Reports.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_Medical Reports.pdf"
         print(loc)
@@ -890,7 +890,7 @@ def upDoc(driver, df, start_time, index):
     
 
     if doc6 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Other.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Other.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_Other.pdf"
         print(loc)
@@ -907,7 +907,7 @@ def upDoc(driver, df, start_time, index):
         driver.find_element_by_id('uploadButton').click()
     '''
     if doc7 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Delay Condonation.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Delay Condonation.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_Delay Condonation.pdf"
         print(loc)
@@ -923,7 +923,7 @@ def upDoc(driver, df, start_time, index):
         driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
     if doc8 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Disablity Certificate.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Disablity Certificate.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_Disablity Certificate.pdf"
         print(loc)
@@ -939,7 +939,7 @@ def upDoc(driver, df, start_time, index):
         driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
     if doc9 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_EIR.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_EIR.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_EIR.pdf"
         print(loc)
@@ -955,7 +955,7 @@ def upDoc(driver, df, start_time, index):
         driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
     if doc10 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_MLC.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_MLC.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_MLC.pdf"
         print(loc)
@@ -971,7 +971,7 @@ def upDoc(driver, df, start_time, index):
         driver.implicitly_wait(10)
         driver.find_element_by_id('uploadButton').click()
     if doc11 == 'Yes':
-        loc = os.path.join(config.PROJECT_ROOT, DATA_OF_PATIENT, regID, f"{pname}_Self Attested.pdf")
+        loc = os.path.join(config.PROJECT_ROOT, "client_data", DATA_OF_PATIENT, regID, f"{pname}_Self Attested.pdf")
         # loc = "/home/akash/ProjectSelenium/Data of patient/" + \
         #     regID + "/" + pname+"_Self Attested.pdf"
         print(loc)
@@ -1626,7 +1626,7 @@ def main():
     time1 = datetime.now().strftime("%H:%M:%S")
 
     # xls sheet read
-    file = os.path.join(config.PROJECT_ROOT, "Patient Details Form.csv")
+    file = os.path.join(config.PROJECT_ROOT, "client_data", "Patient Details Form.csv")
     df = pd.read_csv(file)
 
 

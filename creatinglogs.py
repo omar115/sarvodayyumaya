@@ -13,7 +13,7 @@ def logs(time1,time2,claimid,ipnum):
     fun = pd.DataFrame([[time1, time2, claimid, ipnum, tarik, 'successful']], 
         columns=['start_time', 'end_time', 'claim id','ip number','date','status'])
    
-    loc = os.path.join(config.PROJECT_ROOT, 'reporting', 'foo.csv')
+    loc = os.path.join(config.PROJECT_ROOT, 'client_data', 'reporting', 'foo.csv')
     fun.to_csv(loc , index = False, header = False, mode='a')
 
 
